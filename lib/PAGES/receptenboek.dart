@@ -23,7 +23,7 @@ class _ReceptenboekState extends State<Receptenboek> {
         centerTitle: true,
       ),
       body: MasonryGridView.count(
-        crossAxisCount: 3,
+        crossAxisCount: 2,
         mainAxisSpacing: 0,
         crossAxisSpacing: 0,
         itemBuilder: (context, index) {

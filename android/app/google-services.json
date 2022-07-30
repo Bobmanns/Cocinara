@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1016996388674",
+    "project_id": "cocinara-21548",
+    "storage_bucket": "cocinara-21548.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1016996388674:android:b65612aa3a18eace2072db",
+        "android_client_info": {
+          "package_name": "com.example.my_cocinara"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1016996388674-414l4ugb8v75uvg9l924p57aql5fuj37.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo769YbrKOL0_3A8J4Mgz2-LNX7mwGUls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1016996388674-414l4ugb8v75uvg9l924p57aql5fuj37.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1016996388674-lthijplhnmvvvo57pgm4cgo5ikufbrlf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myCocinara"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

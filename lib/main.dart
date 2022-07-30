@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:my_cocinara/PAGES/homepage.dart';
 import 'package:my_cocinara/PAGES/receptenboek.dart';
 import 'package:my_cocinara/PAGES/settings.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const App());
 }
 

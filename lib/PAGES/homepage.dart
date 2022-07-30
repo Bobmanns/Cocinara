@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -8,6 +9,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePaginaState extends State<HomePage> {
+  var db = FirebaseFirestore.instance; 
+
   int currentIndex = 0;
   @override
   Widget build(context) {
@@ -23,8 +26,20 @@ class _HomePaginaState extends State<HomePage> {
         title: const Text("Homepage"),
         centerTitle: true,
       ),
-      body: const Center(
-        child: Text('Hoi Bob, wat wil je eten?'),
+      body:  Center(
+        child: FutureBuilder(future: db.collection('recipes').get(), builder: (context, snapshot){
+
+          if (snapshot.hasData && snapshot.connectionState==ConnectionState.done){
+            List l = [];
+            QuerySnapshot q = snapshot.data! as QuerySnapshot;
+            for (var doc in q.docs){
+              l.add(doc.name);
+            }
+            return Text(l.join(', '),);
+          }
+          else { return CircularProgressIndicator()}
+        },),
+
       ),
     );
   }
