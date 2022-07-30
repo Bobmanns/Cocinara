@@ -33,11 +33,11 @@ class _HomePaginaState extends State<HomePage> {
             List l = [];
             QuerySnapshot q = snapshot.data! as QuerySnapshot;
             for (var doc in q.docs){
-              l.add(doc.name);
+              l.add(doc.get("name") as String);
             }
             return Text(l.join(', '),);
           }
-          else { return CircularProgressIndicator()}
+          else { return const CircularProgressIndicator(); }
         },),
 
       ),

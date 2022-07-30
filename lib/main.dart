@@ -30,7 +30,7 @@ class _AppState extends State<App> {
       initialRoute: '/',
       routes: {
         '/': (context) => const MainPage(),
-        '/settings': (context) => const Settings(),
+        '/settings': (context) => const SettingsPage(),
       },
     );
   }
