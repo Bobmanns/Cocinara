@@ -9,7 +9,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePaginaState extends State<HomePage> {
-  var db = FirebaseFirestore.instance; 
+  var db = FirebaseFirestore.instance;
+
+  final city = <String, String>{
+    "name": "Los Angeles",
+    "state": "CA",
+    "country": "USA"
+  };
 
   int currentIndex = 0;
   @override
@@ -26,20 +32,25 @@ class _HomePaginaState extends State<HomePage> {
         title: const Text("Homepage"),
         centerTitle: true,
       ),
-      body:  Center(
-        child: FutureBuilder(future: db.collection('recipes').get(), builder: (context, snapshot){
-
-          if (snapshot.hasData && snapshot.connectionState==ConnectionState.done){
-            List l = [];
-            QuerySnapshot q = snapshot.data! as QuerySnapshot;
-            for (var doc in q.docs){
-              l.add(doc.get("name") as String);
+      body: Center(
+        child: FutureBuilder(
+          future: db.collection('recipes').get(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData &&
+                snapshot.connectionState == ConnectionState.done) {
+              List l = [];
+              QuerySnapshot q = snapshot.data! as QuerySnapshot;
+              for (var doc in q.docs) {
+                l.add(doc.get("name") as String);
+              }
+              return Text(
+                l.join(', '),
+              );
+            } else {
+              return const CircularProgressIndicator();
             }
-            return Text(l.join(', '),);
-          }
-          else { return const CircularProgressIndicator(); }
-        },),
-
+          },
+        ),
       ),
     );
   }

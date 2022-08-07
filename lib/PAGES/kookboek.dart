@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // Favoriete Receptenboek gebundeld in een 'boek'
 // Een recept kan lokaal aangemaakt worden of gedeeld met anderen.
-// Receptenboek van anderen kunnen lokaal gewijzigd worden (bijvoorbeeld een extra bouillonblokje toevoegen).
+// Recepten van anderen kunnen lokaal gewijzigd worden (bijvoorbeeld een extra bouillonblokje toevoegen).
 
 class Kookboek extends StatelessWidget {
   const Kookboek({super.key});

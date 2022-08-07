@@ -4,7 +4,7 @@ import 'package:my_cocinara/PAGES/receptenboek.dart';
 import 'package:my_cocinara/PAGES/settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
