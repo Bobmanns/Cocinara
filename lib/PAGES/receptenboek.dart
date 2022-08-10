@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Classes/recepten.dart';
 
@@ -119,57 +118,88 @@ class _ReceptenboekState extends State<Receptenboek> {
   }
 }
 
-// Foto's van de recepten
-Widget buildImageCard(int index) => Card(
-  elevation: 0,
-  margin: EdgeInsets.zero,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(0),
-  ),
-  child: Container(
-      margin: const EdgeInsets.all(5),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Image.network(
-          'https://source.unsplash.com/random?sig=$index',
-          fit: BoxFit.cover,
-        ),
-      )),
-);
+class IngredientTab extends StatefulWidget {
+  final List<Ingredient> ingredients;
+
+  const IngredientTab(this.ingredients, {Key? key}) : super(key: key);
+
+  @override
+  // ignore: no_logic_in_create_state
+  State<StatefulWidget> createState() => IngredientTabState(List.filled(ingredients.length, false));
+}
+
+class IngredientTabState extends State<IngredientTab> {
+  List<bool> checked = [];
+
+  IngredientTabState(this.checked);
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: List.generate(widget.ingredients.length, (index) => CheckboxListTile(
+          value: checked[index],
+          controlAffinity: ListTileControlAffinity.leading,
+          title: Text(widget.ingredients[index].ingredientName),
+          onChanged: (newVal) {
+            setState(() {
+              checked[index] = newVal ?? false;
+            });
+          }
+        ))
+      ),
+    );
+  }
+}
 
 Widget recipePage(BuildContext context, Recipe r) {
   return DefaultTabController(
     length: 2,
     child: Scaffold(
       body: Column(
+        mainAxisSize: MainAxisSize.min,
+        
         children: [
-          Container(
-            color: Colors.amber,
-            child: const AspectRatio(aspectRatio: 16.0/9.0),
+          SizedBox(height: 120, child: Container(color: Colors.amber[900])),
+          Text(
+            r.name,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: const [
-              Text("Hoofdgerecht"),
-              Icon(Icons.schedule),
-              Text("20 minuten"),
-              Icon(Icons.person),
-              Text("4 personen")
-            ],
-          ),
-          const TabBar(tabs: [
-            Tab(text: "Ingrediënten",),
-            Tab(text: "Bereiding",),
-          ]),
-          TabBarView(children: [
-            Wrap(
-              children: List.generate(r.ingredients.length, (index) {
-                Ingredient i = r.ingredients[index];
-                return Chip(label: Text("${i.ingredientQuantity} ${i.ingredientName}"),);
-              }),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Text("Hoofdgerecht"),
+                Icon(Icons.schedule),
+                Text("20 minuten"),
+                Icon(Icons.person),
+                Text("4 personen")
+              ],
             ),
-            Text(r.preparation.join("/"))
-          ]),
+          ),
+          TabBar(
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+                width: 2.0
+              )
+            ),
+            labelColor: Theme.of(context).primaryColor,
+            
+            tabs: const [
+              Tab(text: "Ingrediënten",),
+              Tab(text: "Bereiding",),
+            ]
+          ),
+          Flexible(
+            child: TabBarView(
+              children: [
+                IngredientTab(r.ingredients),
+                Text(r.preparation.join("/"))
+              ]
+            ),
+          ),
           
 
         ],
