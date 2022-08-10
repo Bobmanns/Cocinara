@@ -98,23 +98,7 @@ class _ReceptenboekState extends State<Receptenboek> {
                     child: InkWell(
                       onTap: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) {
-                            return Scaffold(
-                              appBar: AppBar(title: Text(r.name)),
-                              body: Column(
-                                children: [
-                                  Wrap(
-                                    children: List.generate(r.ingredients.length, (index) {
-                                      Ingredient i = r.ingredients[index];
-                                      return Chip(label: Text("${i.ingredientQuantity} ${i.ingredientName}"),);
-                                    }),
-                                  ),
-
-                                  Text(r.preparation.join("/"))
-                                ],
-                              )
-                            );
-                          })
+                          MaterialPageRoute(builder: (context) => recipePage(context, r))
                         );
                       },
                       child: SizedBox(
@@ -137,18 +121,59 @@ class _ReceptenboekState extends State<Receptenboek> {
 
 // Foto's van de recepten
 Widget buildImageCard(int index) => Card(
-      elevation: 0,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0),
-      ),
-      child: Container(
-          margin: const EdgeInsets.all(5),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Image.network(
-              'https://source.unsplash.com/random?sig=$index',
-              fit: BoxFit.cover,
+  elevation: 0,
+  margin: EdgeInsets.zero,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(0),
+  ),
+  child: Container(
+      margin: const EdgeInsets.all(5),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Image.network(
+          'https://source.unsplash.com/random?sig=$index',
+          fit: BoxFit.cover,
+        ),
+      )),
+);
+
+Widget recipePage(BuildContext context, Recipe r) {
+  return DefaultTabController(
+    length: 2,
+    child: Scaffold(
+      body: Column(
+        children: [
+          Container(
+            color: Colors.amber,
+            child: const AspectRatio(aspectRatio: 16.0/9.0),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: const [
+              Text("Hoofdgerecht"),
+              Icon(Icons.schedule),
+              Text("20 minuten"),
+              Icon(Icons.person),
+              Text("4 personen")
+            ],
+          ),
+          const TabBar(tabs: [
+            Tab(text: "Ingrediënten",),
+            Tab(text: "Bereiding",),
+          ]),
+          TabBarView(children: [
+            Wrap(
+              children: List.generate(r.ingredients.length, (index) {
+                Ingredient i = r.ingredients[index];
+                return Chip(label: Text("${i.ingredientQuantity} ${i.ingredientName}"),);
+              }),
             ),
-          )),
-    );
+            Text(r.preparation.join("/"))
+          ]),
+          
+
+        ],
+      )
+    )
+  );
+}
