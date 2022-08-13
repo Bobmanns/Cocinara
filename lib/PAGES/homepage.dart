@@ -11,47 +11,105 @@ class HomePage extends StatefulWidget {
 class _HomePaginaState extends State<HomePage> {
   var db = FirebaseFirestore.instance;
 
-  final city = <String, String>{
-    "name": "Los Angeles",
-    "state": "CA",
-    "country": "USA"
-  };
-
   int currentIndex = 0;
   @override
   Widget build(context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        elevation: 1.5,
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/settings');
-              },
-              icon: const Icon(Icons.settings))
+              onPressed: () {},
+              icon: const Icon(
+                Icons.person,
+                color: Colors.black,
+              ))
         ],
-        title: const Text("Homepage"),
-        centerTitle: true,
+        title: const Text(
+          "Hey Bob, welkom terug!",
+          style:
+              TextStyle(color: Color.fromARGB(255, 29, 29, 29), fontSize: 16),
+        ),
+        centerTitle: false,
       ),
-      body: Center(
-        child: FutureBuilder(
-          future: db.collection('recipes').get(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData &&
-                snapshot.connectionState == ConnectionState.done) {
-              List l = [];
-              QuerySnapshot q = snapshot.data! as QuerySnapshot;
-              for (var doc in q.docs) {
-                l.add(doc.get("name") as String);
-              }
-              return Text(
-                l.join(', '),
-              );
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
+      body: Container(
+        margin: const EdgeInsets.all(10),
+        width: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(children: [
+            const SizedBox(
+              height: 10,
+            ),
+
+            // Deze Container bevat de verschillende kookboeken
+            Container(
+              width: double.infinity,
+              height: 250,
+              padding: const EdgeInsets.all(15),
+              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  color: Colors.blue),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    buildCard(),
+                    const SizedBox(width: 15),
+                    buildCard(),
+                    const SizedBox(width: 15),
+                    buildCard(),
+                    const SizedBox(width: 15),
+                    buildCard(),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              height: 30,
+              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: const EdgeInsets.all(5),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  color: Colors.blue),
+              child: const Center(child: Text('This is a searchbar')),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: double.infinity,
+              height: 275,
+              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  color: Colors.blue),
+              child: const Center(
+                  child: Text(
+                      'wat eten wij vandaag? maaltijdplanner placeholder ')),
+            ),
+            const SizedBox(height: 10),
+          ]),
         ),
       ),
     );
   }
+
+// Placeholder widget for book or recipes (MVP)
+  Widget buildCard() => Container(
+        width: 150,
+        height: 225,
+        decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            color: Colors.amber),
+        child: const Center(
+          child: Text(
+            'Kookboek of eigen recepten',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
 }

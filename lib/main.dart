@@ -4,6 +4,7 @@ import 'package:my_cocinara/PAGES/receptenboek.dart';
 import 'package:my_cocinara/PAGES/settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter/gestures.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
@@ -22,10 +23,12 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
       title: 'Cocinara',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primarySwatch: Colors.blue,
+          appBarTheme:
+              const AppBarTheme(color: Color.fromARGB(255, 254, 254, 255))),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
@@ -54,6 +57,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) => Scaffold(
         body: screens[currentIndex],
         bottomNavigationBar: BottomNavigationBar(
+            elevation: 5,
             showUnselectedLabels: false,
             currentIndex: currentIndex,
             onTap: (index) => setState(() => currentIndex = index),
@@ -74,4 +78,13 @@ class _MainPageState extends State<MainPage> {
               ),
             ]),
       );
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
