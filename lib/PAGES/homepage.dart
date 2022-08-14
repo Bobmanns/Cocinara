@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../Classes/recepten.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -10,12 +12,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePaginaState extends State<HomePage> {
   var db = FirebaseFirestore.instance;
+  List<Recipe> recipes = [];
 
   int currentIndex = 0;
   @override
   Widget build(context) {
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 1.5,
         actions: [
@@ -50,7 +52,7 @@ class _HomePaginaState extends State<HomePage> {
               margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(15)),
-                  color: Colors.blue),
+                  color: Color.fromARGB(255, 225, 225, 225)),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -74,7 +76,7 @@ class _HomePaginaState extends State<HomePage> {
               padding: const EdgeInsets.all(5),
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(15)),
-                  color: Colors.blue),
+                  color: Color.fromARGB(255, 225, 225, 225)),
               child: const Center(child: Text('This is a searchbar')),
             ),
             const SizedBox(
@@ -86,7 +88,7 @@ class _HomePaginaState extends State<HomePage> {
               margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(15)),
-                  color: Colors.blue),
+                  color: Color.fromARGB(255, 225, 225, 225)),
               child: const Center(
                   child: Text(
                       'wat eten wij vandaag? maaltijdplanner placeholder ')),
@@ -103,12 +105,19 @@ class _HomePaginaState extends State<HomePage> {
         width: 150,
         height: 225,
         decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
+            borderRadius: BorderRadius.all(Radius.circular(15)),
             color: Colors.amber),
-        child: const Center(
-          child: Text(
-            'Kookboek of eigen recepten',
-            textAlign: TextAlign.center,
+        child: Card(
+          elevation: 0.0,
+          color: Colors.amber,
+          child: InkWell(
+            onTap: () {},
+            child: const Center(
+              child: Text(
+                'Kookboek, eigen recepten of populair deze week',
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
       );

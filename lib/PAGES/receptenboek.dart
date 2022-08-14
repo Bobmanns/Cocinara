@@ -114,6 +114,7 @@ class IngredientTab extends StatefulWidget {
   @override
   // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() =>
+      // ignore: no_logic_in_create_state
       IngredientTabState(List.filled(ingredients.length, true));
 }
 
