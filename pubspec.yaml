@@ -38,6 +38,7 @@ dependencies:
   cloud_firestore: ^3.4.1
   wakelock: ^0.6.2
   page_view_indicators: ^2.0.0
+  firebase_storage: ^10.3.5
 
 dev_dependencies:
   flutter_test:

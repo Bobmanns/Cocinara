@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+//import 'package:wakelock/wakelock.dart';
 import 'package:page_view_indicators/page_view_indicators.dart';
 import '../Classes/recepten.dart';
 
@@ -15,38 +18,13 @@ class Receptenboek extends StatefulWidget {
 
 class _ReceptenboekState extends State<Receptenboek> {
   var db = FirebaseFirestore.instance;
+  var storage = FirebaseStorage.instance;
 
   List<Recipe> recipes = [];
 
   Future<List<Recipe>> _loadRecipes() async {
     var recipesSnapshot = await db.collection('recipes').get();
-    var workingList = recipesSnapshot.docs.map((e) {
-      Map<String, dynamic> data = e.data();
-      String recipeName = data["name"];
-
-      var recipePreparationRaw = data["preparation"];
-      List<String> recipePreparation = [];
-
-      for (var i in recipePreparationRaw) {
-        recipePreparation.add(i as String);
-      }
-
-      List<dynamic> recipeIngredientsRaw = data["ingredients"];
-      List<Ingredient> recipeIngredients = [];
-
-      for (Map<String, dynamic> i in recipeIngredientsRaw) {
-        recipeIngredients
-            .add(Ingredient(i["ingredient_name"], i["ingredient_quantity"]));
-      }
-
-      // print(recipeIngredients);
-      // print(recipeName);
-      // print(recipePreparation);
-
-      return Recipe(recipeIngredients, recipeName, recipePreparation);
-    });
-
-    return workingList.toList();
+    return recipesSnapshot.docs.map((e) => Recipe.fromJSON(e.data())).toList();
   }
 
   @override
@@ -91,23 +69,56 @@ class _ReceptenboekState extends State<Receptenboek> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: List.generate(recipes.length, (index) {
                     Recipe r = recipes[index];
-                    return Card(
-                      child: InkWell(
-                        onTap: () async {
-                          //Wakelock.enable();
+                    return FutureBuilder(
+                      future: storage
+                          .ref()
+                          .child("recipes/${r.imageUrl}")
+                          .getData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                                ConnectionState.done &&
+                            snapshot.hasData) {
+                          Uint8List imgData = snapshot.data as Uint8List;
 
-                          await Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => recipePage(context, r)));
+                          return Card(
+                            child: InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            recipePage(context, r, imgData)));
 
-                          //Wakelock.disable();
-                        },
-                        child: SizedBox(
-                            height: 50, child: Center(child: Text(r.name))),
-                      ),
+                                //Wakelock.disable();
+                              },
+                              child: SizedBox(
+                                height: 50,
+                                child: Stack(children: [
+                                  Hero(
+                                    tag: imgData.hashCode,
+                                    child: Image.memory(imgData),
+                                  ),
+                                  Center(child: Text(r.name)),
+                                ]),
+                              ),
+                            ),
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text(
+                              "Astaghfirullah er is iets fout gegaan, ${snapshot.error}");
+                        }
+
+                        return const CircularProgressIndicator();
+                      }
                     );
-                  })),
-            ));
-          }),
+                  }
+                )
+              ),
+            )
+          );
+        }
+      ),
     );
   }
 }
@@ -195,14 +206,22 @@ class PreparationTabState extends State<PreparationTab> {
 }
 
 // add back button
-Widget recipePage(BuildContext context, Recipe r) {
+Widget recipePage(BuildContext context, Recipe r, Uint8List imgData) {
   return DefaultTabController(
       length: 2,
       child: Scaffold(
           body: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(height: 120, child: Container(color: Colors.amber[900])),
+          Hero(
+            tag: imgData.hashCode,
+            child: Image.memory(
+              imgData,
+              height: 240,
+              fit: BoxFit.cover,
+            ),
+          ),
           Text(
             r.name,
             style: Theme.of(context).textTheme.titleLarge,
@@ -240,5 +259,7 @@ Widget recipePage(BuildContext context, Recipe r) {
             ]),
           ),
         ],
-      )));
+      )
+    )
+  );
 }
