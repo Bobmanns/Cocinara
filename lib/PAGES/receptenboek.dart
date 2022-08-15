@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:wakelock/wakelock.dart';
+import 'package:page_view_indicators/page_view_indicators.dart';
 import '../Classes/recepten.dart';
 
 // Staggered Gridview (zoals pinterest) met verschillende Recepten die mensen kunnen toevoegen aan hun kookboek.
@@ -91,9 +93,13 @@ class _ReceptenboekState extends State<Receptenboek> {
                     Recipe r = recipes[index];
                     return Card(
                       child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
+                        onTap: () async {
+                          //Wakelock.enable();
+
+                          await Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => recipePage(context, r)));
+
+                          //Wakelock.disable();
                         },
                         child: SizedBox(
                             height: 50, child: Center(child: Text(r.name))),
@@ -132,12 +138,58 @@ class IngredientTabState extends State<IngredientTab> {
               (index) => CheckboxListTile(
                   value: checked[index],
                   controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(widget.ingredients[index].ingredientName),
+                  title: Text(
+                      "${widget.ingredients[index].ingredientName} (${widget.ingredients[index].ingredientQuantity})"),
                   onChanged: (newVal) {
                     setState(() {
                       checked[index] = newVal ?? false;
                     });
                   }))),
+    );
+  }
+}
+
+class PreparationTab extends StatefulWidget {
+  final List<String> preparation;
+
+  const PreparationTab(this.preparation, {Key? key}) : super(key: key);
+
+  @override
+  State<PreparationTab> createState() => PreparationTabState();
+}
+
+class PreparationTabState extends State<PreparationTab> {
+  final ValueNotifier<int> currentIndex = ValueNotifier(0);
+  final PageController pageController = PageController(initialPage: 0);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: PageView.builder(
+              itemBuilder: (context, index) => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(child: Text(widget.preparation[index])),
+                ),
+              ),
+              controller: pageController,
+              itemCount: widget.preparation.length,
+              onPageChanged: (value) {
+                currentIndex.value = value;
+              },
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          CirclePageIndicator(
+              currentPageNotifier: currentIndex,
+              itemCount: widget.preparation.length)
+        ],
+      ),
     );
   }
 }
@@ -184,7 +236,7 @@ Widget recipePage(BuildContext context, Recipe r) {
           Flexible(
             child: TabBarView(children: [
               IngredientTab(r.ingredients),
-              Text(r.preparation.join("/"))
+              PreparationTab(r.preparation)
             ]),
           ),
         ],

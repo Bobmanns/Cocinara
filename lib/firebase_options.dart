@@ -67,7 +67,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1016996388674',
     projectId: 'cocinara-21548',
     storageBucket: 'cocinara-21548.appspot.com',
-    iosClientId: '1016996388674-lthijplhnmvvvo57pgm4cgo5ikufbrlf.apps.googleusercontent.com',
+    iosClientId:
+        '1016996388674-lthijplhnmvvvo57pgm4cgo5ikufbrlf.apps.googleusercontent.com',
     iosBundleId: 'com.example.myCocinara',
   );
 
@@ -77,7 +78,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1016996388674',
     projectId: 'cocinara-21548',
     storageBucket: 'cocinara-21548.appspot.com',
-    iosClientId: '1016996388674-lthijplhnmvvvo57pgm4cgo5ikufbrlf.apps.googleusercontent.com',
+    iosClientId:
+        '1016996388674-lthijplhnmvvvo57pgm4cgo5ikufbrlf.apps.googleusercontent.com',
     iosBundleId: 'com.example.myCocinara',
   );
 }

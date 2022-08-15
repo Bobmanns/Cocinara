@@ -4,8 +4,7 @@ class Ingredient {
   // ingredient quantity
   final String? ingredientQuantity;
 
-  const Ingredient(
-      this.ingredientName, this.ingredientQuantity);
+  const Ingredient(this.ingredientName, this.ingredientQuantity);
 
 // hoe krijg ik de ingredienten uit de database?
 }
