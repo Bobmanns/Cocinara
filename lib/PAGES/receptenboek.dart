@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 //import 'package:wakelock/wakelock.dart';
 import 'package:page_view_indicators/page_view_indicators.dart';
 import '../Classes/recepten.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 // Staggered Gridview (zoals pinterest) met verschillende Recepten die mensen kunnen toevoegen aan hun kookboek.
 // to do: Filter
@@ -29,18 +30,7 @@ class _ReceptenboekState extends State<Receptenboek> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back_ios),
-        ),
-        title: const Text('Receptenboek'),
-        centerTitle: true,
-      ),
-      body: FutureBuilder(
+    return FutureBuilder(
           future: _loadRecipes(),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
@@ -52,74 +42,75 @@ class _ReceptenboekState extends State<Receptenboek> {
                   "Er is een error: ${snapshot.error} met data ${snapshot.data}");
             }
 
-            // return MasonryGridView.count(
-            //   crossAxisCount: 2,
-            //   mainAxisSpacing: 0,
-            //   crossAxisSpacing: 0,
-            //   itemBuilder: (context, index) {
-            //     return buildImageCard(index);
-            //   },
-
-            // );
             List<Recipe> recipes = snapshot.data! as List<Recipe>;
-            return SingleChildScrollView(
-                child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: List.generate(recipes.length, (index) {
-                    Recipe r = recipes[index];
-                    return FutureBuilder(
-                      future: storage
-                          .ref()
-                          .child("recipes/${r.imageUrl}")
-                          .getData(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                                ConnectionState.done &&
-                            snapshot.hasData) {
-                          Uint8List imgData = snapshot.data as Uint8List;
+            return MasonryGridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 0,
+              itemBuilder: (context, index) {
+                Recipe r = recipes[index % recipes.length];
+                return FutureBuilder(
+                    future:
+                        storage.ref().child("recipes/${r.imageUrl}").getData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        Uint8List imgData = snapshot.data as Uint8List;
 
-                          return Card(
-                            child: InkWell(
-                              onTap: () async {
-                                await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            recipePage(context, r, imgData)));
+                        return Card(
+                          elevation: 0.0,
+                          clipBehavior: Clip.hardEdge,
+                          child: InkWell(
+                            onTap: () {
+                              //TODO: history bewerken zodat back button altijd werkt
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      recipePage(context, r, imgData)));
 
-                                //Wakelock.disable();
-                              },
-                              child: SizedBox(
-                                height: 50,
-                                child: Stack(children: [
-                                  Hero(
+                              //Wakelock.disable();
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Flexible(
+                                  child: Hero(
                                     tag: imgData.hashCode,
                                     child: Image.memory(imgData),
                                   ),
-                                  Center(child: Text(r.name)),
-                                ]),
-                              ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text(r.name)),
+                                ),
+                              ]
                             ),
-                          );
-                        }
-
-                        if (snapshot.hasError) {
-                          return Text(
-                              "Astaghfirullah er is iets fout gegaan, ${snapshot.error}");
-                        }
-
-                        return const CircularProgressIndicator();
+                          ),
+                        );
                       }
-                    );
-                  }
-                )
-              ),
-            )
-          );
-        }
-      ),
-    );
+
+                      if (snapshot.hasError) {
+                        return Text(
+                            "Astaghfirullah er is iets fout gegaan, ${snapshot.error}");
+                      }
+
+                      return const Card(
+                        elevation: 0.0,
+                        child: SizedBox(
+                          height: 200,
+                          child: Center(
+                            child: SizedBox(
+                              height: 30, 
+                              width: 30,
+                              child: CircularProgressIndicator())
+                          ),
+                        ),
+                      );
+                    });
+              },
+            );
+          });
   }
 }
 
@@ -214,13 +205,25 @@ Widget recipePage(BuildContext context, Recipe r, Uint8List imgData) {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Hero(
-            tag: imgData.hashCode,
-            child: Image.memory(
-              imgData,
-              height: 240,
-              fit: BoxFit.cover,
-            ),
+          Stack(
+            fit: StackFit.passthrough,
+            children: [
+              Hero(
+                tag: imgData.hashCode,
+                child: Image.memory(
+                  imgData,
+                  height: 240,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.arrow_back),
+                color: Colors.white,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                )
+            ]
           ),
           Text(
             r.name,
@@ -259,7 +262,5 @@ Widget recipePage(BuildContext context, Recipe r, Uint8List imgData) {
             ]),
           ),
         ],
-      )
-    )
-  );
+      )));
 }
