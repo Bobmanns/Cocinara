@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_cocinara/PAGES/boodschappenlijst.dart';
 import 'package:my_cocinara/PAGES/homepage.dart';
 import 'package:my_cocinara/PAGES/receptenboek.dart';
 import 'package:my_cocinara/PAGES/settings.dart';
@@ -6,6 +7,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/gestures.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'Classes/recepten.dart';
+import 'Classes/notification.dart';
 
 void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -43,19 +47,35 @@ class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<MainPage> createState() => MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+
+class MainPageState extends State<MainPage> {
+  List<Ingredient> boodschappenLijst = const [
+    Ingredient("Linzen", "180 gram"),
+    Ingredient("Aardappel", "drie stuks")
+  ];
   int currentIndex = 0;
   final screens = [
     const HomePage(),
     const Receptenboek(),
-    const Center(child: Text('Groceries', style: TextStyle(fontSize: 60))),
+    const Boodschappenlijst()
   ];
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: screens[currentIndex],
+        body: NotificationListener<BoodschappenNotification>(
+          onNotification: ((notification) {
+            print("notificatie met inhoud ${notification.nieuweBoodschappen} ontvangen");
+
+            setState(() {
+              boodschappenLijst.addAll(notification.nieuweBoodschappen);
+            });
+
+            return true;
+          }),
+          child: screens[currentIndex],
+        ),
         bottomNavigationBar: BottomNavigationBar(
             elevation: 5,
             showUnselectedLabels: false,

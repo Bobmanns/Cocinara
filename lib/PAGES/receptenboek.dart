@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:my_cocinara/Classes/notification.dart';
 //import 'package:wakelock/wakelock.dart';
 import 'package:page_view_indicators/page_view_indicators.dart';
 import '../Classes/recepten.dart';
@@ -29,10 +30,10 @@ class _ReceptenboekState extends State<Receptenboek> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext bronContext) {
     return FutureBuilder(
           future: _loadRecipes(),
-          builder: (context, snapshot) {
+          builder: (bronContext, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               return const CircularProgressIndicator();
             }
@@ -62,10 +63,9 @@ class _ReceptenboekState extends State<Receptenboek> {
                           clipBehavior: Clip.hardEdge,
                           child: InkWell(
                             onTap: () {
-                              //TODO: history bewerken zodat back button altijd werkt
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      recipePage(context, r, imgData)));
+                                      recipePage(context, r, imgData, bronContext)));
 
                               //Wakelock.disable();
                             },
@@ -116,8 +116,9 @@ class _ReceptenboekState extends State<Receptenboek> {
 
 class IngredientTab extends StatefulWidget {
   final List<Ingredient> ingredients;
+  final BuildContext notificatieContext;
 
-  const IngredientTab(this.ingredients, {Key? key}) : super(key: key);
+  const IngredientTab(this.ingredients, this.notificatieContext, {Key? key}) : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
@@ -135,18 +136,41 @@ class IngredientTabState extends State<IngredientTab> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-          children: List.generate(
-              widget.ingredients.length,
-              (index) => CheckboxListTile(
-                  value: checked[index],
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(
-                      "${widget.ingredients[index].ingredientName} (${widget.ingredients[index].ingredientQuantity})"),
-                  onChanged: (newVal) {
-                    setState(() {
-                      checked[index] = newVal ?? false;
-                    });
-                  }))),
+        children: List.generate(
+            widget.ingredients.length,
+            (index) => CheckboxListTile(
+                value: checked[index],
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(
+                    "${widget.ingredients[index].ingredientName} (${widget.ingredients[index].ingredientQuantity})"),
+                onChanged: (newVal) {
+                  setState(() {
+                    checked[index] = newVal ?? false;
+                  });
+                })
+              )..add(
+                ElevatedButton.icon(
+                  onPressed: () {
+                    List<Ingredient> toeTeVoegenIngredienten = [];
+                    for (int i = 0; i < checked.length; i++ ) {
+                      if (checked[i]) {
+                        toeTeVoegenIngredienten.add(widget.ingredients[i]);
+                      }
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Ingrediënten toegevoegd"),)
+                    );
+
+                    var notificatie = BoodschappenNotification(toeTeVoegenIngredienten);
+                    notificatie.dispatch(widget.notificatieContext);
+
+                    print("Notificatie met inhoud $toeTeVoegenIngredienten gedispatcht");
+                  },
+                  icon: const Icon(Icons.add_shopping_cart), 
+                  label: const Text("Voeg ingrediënten toe"))
+              )
+            ),
     );
   }
 }
@@ -196,8 +220,7 @@ class PreparationTabState extends State<PreparationTab> {
   }
 }
 
-// add back button
-Widget recipePage(BuildContext context, Recipe r, Uint8List imgData) {
+Widget recipePage(BuildContext context, Recipe r, Uint8List imgData, BuildContext notificatieContext) {
   return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -217,7 +240,7 @@ Widget recipePage(BuildContext context, Recipe r, Uint8List imgData) {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 color: Colors.white,
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -257,10 +280,12 @@ Widget recipePage(BuildContext context, Recipe r, Uint8List imgData) {
               ]),
           Flexible(
             child: TabBarView(children: [
-              IngredientTab(r.ingredients),
+              IngredientTab(r.ingredients, notificatieContext),
               PreparationTab(r.preparation)
             ]),
           ),
         ],
-      )));
+      )
+    )
+  );
 }
