@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:my_cocinara/Classes/recepten.dart';
 import '../main.dart';
@@ -8,7 +6,7 @@ class BoodschappenlijstItem extends StatefulWidget {
   final Ingredient ingredient;
 
 
-  const BoodschappenlijstItem(this.ingredient);
+  const BoodschappenlijstItem(this.ingredient, {Key? key}) : super(key: key);
 
   @override
   BoodschappenlijstItemState createState() => BoodschappenlijstItemState();

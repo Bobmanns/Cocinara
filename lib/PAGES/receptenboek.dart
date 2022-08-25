@@ -164,8 +164,6 @@ class IngredientTabState extends State<IngredientTab> {
 
                     var notificatie = BoodschappenNotification(toeTeVoegenIngredienten);
                     notificatie.dispatch(widget.notificatieContext);
-
-                    print("Notificatie met inhoud $toeTeVoegenIngredienten gedispatcht");
                   },
                   icon: const Icon(Icons.add_shopping_cart), 
                   label: const Text("Voeg ingrediënten toe"))

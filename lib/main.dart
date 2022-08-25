@@ -66,8 +66,6 @@ class MainPageState extends State<MainPage> {
   Widget build(BuildContext context) => Scaffold(
         body: NotificationListener<BoodschappenNotification>(
           onNotification: ((notification) {
-            print("notificatie met inhoud ${notification.nieuweBoodschappen} ontvangen");
-
             setState(() {
               boodschappenLijst.addAll(notification.nieuweBoodschappen);
             });
