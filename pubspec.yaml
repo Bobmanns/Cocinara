@@ -39,6 +39,7 @@ dependencies:
   wakelock: ^0.6.2
   page_view_indicators: ^2.0.0
   firebase_storage: ^10.3.5
+  firebase_auth: ^3.7.0
 
 dev_dependencies:
   flutter_test:

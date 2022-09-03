@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:my_cocinara/PAGES/boodschappenlijst.dart';
 import 'package:my_cocinara/PAGES/homepage.dart';
+import 'package:my_cocinara/PAGES/kookboek.dart';
 import 'package:my_cocinara/PAGES/receptenboek.dart';
 import 'package:my_cocinara/PAGES/settings.dart';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'package:flutter/gestures.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,17 +37,64 @@ class _AppState extends State<App> {
           appBarTheme:
               const AppBarTheme(color: Color.fromARGB(255, 254, 254, 255))),
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const MainPage(),
-        '/settings': (context) => const SettingsPage(),
-      },
+      home: const AuthPage(),
+    );
+  }
+}
+
+class AuthPage extends StatelessWidget {
+  const AuthPage({Key? key}): super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.data == null) {
+            return Center(
+              child: Column(
+                children: [
+                  const Text("Welkom bij Cocinara", style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 60.0,),
+                  ElevatedButton.icon(
+                    onPressed: () {}, 
+                    icon: Icon(Icons.email), 
+                    label: Text("Login met e-mail")
+                  ),
+                  const SizedBox(height: 8.0,),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+                    }, 
+                    icon: Icon(Icons.face), 
+                    label: Text("Login met Google")
+                  ),
+                  const SizedBox(height: 8.0,),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      FirebaseAuth.instance.signInAnonymously();
+                    }, 
+                    icon: Icon(Icons.person),
+                    label: Text("Gebruik als gast")
+                  )
+                ],
+              ),
+            );
+          } else {
+            return MainPage(snapshot.data!);
+          }
+         
+        }
+      ),
     );
   }
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final User user;
+
+  const MainPage(this.user, {super.key});
 
   @override
   State<MainPage> createState() => MainPageState();
@@ -52,18 +102,24 @@ class MainPage extends StatefulWidget {
 
 
 class MainPageState extends State<MainPage> {
+  late User gebruiker = widget.user;
+
   List<Ingredient> boodschappenLijst = [
     const Ingredient(MetaIngredient("Linzen", "Peulvruchten"), "180 gram"),
     const Ingredient(MetaIngredient("Appelsap", "Dranken"), "1 liter")
   ];
+
   int currentIndex = 0;
-  final screens = [
-    const HomePage(),
-    const Receptenboek(),
-    const Boodschappenlijst()
-  ];
+
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    List<Widget> screens = [
+      HomePage(gebruiker),
+      Kookboek(),
+      Boodschappenlijst()
+    ];
+    
+    return Scaffold(
         body: NotificationListener<BoodschappenNotification>(
           onNotification: ((notification) {
             setState(() {
@@ -96,6 +152,7 @@ class MainPageState extends State<MainPage> {
               ),
             ]),
       );
+  }
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {

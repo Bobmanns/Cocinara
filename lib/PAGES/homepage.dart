@@ -1,10 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Classes/recepten.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final User user;
+
+  const HomePage(this.user, {Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePaginaState();
@@ -22,14 +25,16 @@ class _HomePaginaState extends State<HomePage> {
         elevation: 1.5,
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+              },
               icon: const Icon(
                 Icons.person,
                 color: Colors.black,
               ))
         ],
-        title: const Text(
-          "Hey Bob, welkom terug!",
+        title: Text(
+          "Hey ${widget.user.displayName ?? "gast"}, welkom terug!",
           style:
               TextStyle(color: Color.fromARGB(255, 29, 29, 29), fontSize: 16),
         ),
