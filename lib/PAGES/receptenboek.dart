@@ -26,7 +26,15 @@ class _ReceptenboekState extends State<Receptenboek> {
 
   Future<List<Recipe>> _loadRecipes() async {
     var recipesSnapshot = await db.collection('recipes').get();
-    return recipesSnapshot.docs.map((e) => Recipe.fromJSON(e.data())).toList();
+    
+    List<Recipe> recipes = [];
+
+    for (QueryDocumentSnapshot<Map<String, dynamic>> d in recipesSnapshot.docs) {
+      Recipe r = await Recipe.fromJSON(d.data());
+      recipes.add(r);
+    }
+
+    return recipes;
   }
 
   @override
@@ -142,7 +150,7 @@ class IngredientTabState extends State<IngredientTab> {
                 value: checked[index],
                 controlAffinity: ListTileControlAffinity.leading,
                 title: Text(
-                    "${widget.ingredients[index].ingredientName} (${widget.ingredients[index].ingredientQuantity})"),
+                    "${widget.ingredients[index].ingr.name} (${widget.ingredients[index].quantity})"),
                 onChanged: (newVal) {
                   setState(() {
                     checked[index] = newVal ?? false;

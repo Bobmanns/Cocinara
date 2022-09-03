@@ -52,9 +52,9 @@ class MainPage extends StatefulWidget {
 
 
 class MainPageState extends State<MainPage> {
-  List<Ingredient> boodschappenLijst = const [
-    Ingredient("Linzen", "180 gram"),
-    Ingredient("Aardappel", "drie stuks")
+  List<Ingredient> boodschappenLijst = [
+    const Ingredient(MetaIngredient("Linzen", "Peulvruchten"), "180 gram"),
+    const Ingredient(MetaIngredient("Appelsap", "Dranken"), "1 liter")
   ];
   int currentIndex = 0;
   final screens = [

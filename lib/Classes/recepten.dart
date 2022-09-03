@@ -1,13 +1,27 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Ingredient {
   // ingredient name
-  final String ingredientName;
+  final MetaIngredient ingr;
   // ingredient quantity
-  final String? ingredientQuantity;
+  final String? quantity;
 
-  const Ingredient(this.ingredientName, this.ingredientQuantity);
+  const Ingredient(this.ingr, this.quantity);
 
-  static Ingredient fromJSON(Map<String, dynamic> json) {
-    return Ingredient(json["ingredient_name"], json["ingredient_quantity"]);
+  static Future<Ingredient> fromJSON(Map<String, dynamic> json) async {
+    MetaIngredient ingr = MetaIngredient.fromJSON((await FirebaseFirestore.instance.doc(json["ref"]).get()).data()!);
+    return Ingredient(ingr, json["quantity"]);
+  }
+}
+
+class MetaIngredient {
+  final String name;
+  final String type;
+
+  const MetaIngredient(this.name, this.type);
+
+  static MetaIngredient fromJSON(Map<String, dynamic> json) {
+    return MetaIngredient(json["name"], json["type"]);
   }
 }
 
@@ -19,7 +33,7 @@ class Recipe {
 
   const Recipe(this.ingredients, this.name, this.preparation, this.imageUrl);
 
-  static Recipe fromJSON(Map<String, dynamic> json) {
+  static Future<Recipe> fromJSON(Map<String, dynamic> json) async {
     String recipeName = json["name"];
 
     var recipePreparationRaw = json["preparation"];
@@ -33,7 +47,7 @@ class Recipe {
     List<Ingredient> recipeIngredients = [];
 
     for (Map<String, dynamic> i in recipeIngredientsRaw) {
-      recipeIngredients.add(Ingredient.fromJSON(i));
+      recipeIngredients.add(await Ingredient.fromJSON(i));
     }
 
     String recipeImageUrl = json["image_url"] ?? "";
