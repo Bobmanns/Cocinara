@@ -28,15 +28,15 @@ class _HomePaginaState extends State<HomePage> {
               onPressed: () {
                 FirebaseAuth.instance.signOut();
               },
-              icon: const Icon(
-                Icons.person,
-                color: Colors.black,
-              ))
+              icon: CircleAvatar(
+                foregroundImage: NetworkImage(widget.user.photoURL ?? "https://firebasestorage.googleapis.com/v0/b/cocinara-21548.appspot.com/o/default.jpg?alt=media&token=543de3e0-98aa-4826-a904-0ab5d4c7ec26"),
+              )
+          )
         ],
         title: Text(
           "Hey ${widget.user.displayName ?? "gast"}, welkom terug!",
           style:
-              TextStyle(color: Color.fromARGB(255, 29, 29, 29), fontSize: 16),
+              const TextStyle(color: Color.fromARGB(255, 29, 29, 29), fontSize: 16),
         ),
         centerTitle: false,
       ),
